@@ -1,0 +1,23 @@
+<launch>
+   <!--Run kinect pcl-->
+   <node pkg="kinect" name="pcl" type="pcl" output="screen">
+   </node>
+
+   <!--Run tensorflow objecting detection-->
+   <node pkg="object" name="tfobject" type="tfobject.py" output="screen">
+   </node>
+
+   <!--Run broadcaster to translate point-->
+   <node pkg="robotcontrol" name="robothand_tf_broadcaster" type="robothand_tf_broadcaster" output="screen">
+   </node>
+
+   <!-- Run rqt_image_view--> 
+   <!--node name="rqt_image_view" pkg="rqt_image_view" type="rqt_image_view">
+   <param name="image" value="object_detection"/>
+   </node>
+  
+   <!-- Run rqt_grade--> 
+   <!--<node name="rqt_grade" pkg="rqt_graph" type="rqt_graph">
+   </node-->
+
+</launch>

@@ -1,0 +1,19 @@
+controller_list:
+  - name: six_hand_controller
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    default: true
+    joints:
+      - Joint_1
+      - Joint_2
+      - Joint_3
+      - Joint_4
+      - Joint_5
+      - Joint_6
+
+  - name: six_tip_controller
+    action_ns: gripper_action
+    type: GipperCommand
+    default: true
+    joints:
+      []
