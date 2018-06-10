@@ -12,6 +12,7 @@
 #include <std_msgs/Bool.h>
 #include <std_msgs/Int16.h>
 
+//#include <moveit/motion_planning_rviz_plugin/motion_planning_display.h>
 #include <moveit/planning_request_adapter/planning_request_adapter.h>
 #include <moveit/trajectory_processing/iterative_time_parameterization.h>
 #include <moveit/move_group_interface/move_group_interface.h>
@@ -153,6 +154,7 @@ void transformPoint(const tf::TransformListener& listener)
 void stateCatch(moveit::planning_interface::MoveGroupInterface &group)
 {
    //设置初始位置
+   //moveit_rviz_plugin::MotionPlanningDisplay* display = getDisplay();
    moveit::planning_interface::MoveItErrorCode success;
    std_msgs::Bool pub_msgs;
    pub_msgs.data = true;
@@ -161,9 +163,10 @@ void stateCatch(moveit::planning_interface::MoveGroupInterface &group)
    group.setNamedTarget("ready_work_pose");
    moveit::planning_interface::MoveGroupInterface::Plan plan1_1;
    success = group.plan(plan1_1);
-   ROS_INFO("Visualizing plan 1_1 (catch pose) %s",success == moveit_msgs::MoveItErrorCodes::SUCCESS ? "SUCCESS" : "FAILED");
+   ROS_INFO("Visualizing plan 1_1 (stateCatch pose) %s",success == moveit_msgs::MoveItErrorCodes::SUCCESS ? "SUCCESS" : "FAILED");
    if (success  == moveit_msgs::MoveItErrorCodes::SUCCESS) group.execute(plan1_1);
- 
+   sleep(1);
+
    //设置抓取目标点 
    geometry_msgs::Pose target_pose;
    target_pose.orientation.w = 1.000000;
@@ -179,11 +182,17 @@ void stateCatch(moveit::planning_interface::MoveGroupInterface &group)
    target_pose.position.z = 0.350000;
 
    //进行运动规划
-   group.setStartState(*group.getCurrentState());
+  // state = *planning_display_->getQueryGoalState();
+  //robot_state::RobotState goal = *display->getQueryGoalState();
+  //robot_state::RobotState goal = group.getQueryGoalState();
+   robot_state::RobotState start_state(*group.getCurrentState());
+   group.setStartStateToCurrentState();
+  //group.setStartState(*group.getCurrentState());
+  // group.setStartStateToCurrentState();
    group.setPoseTarget(target_pose);
    moveit::planning_interface::MoveGroupInterface::Plan plan1_2;
    success = group.plan(plan1_2);
-   ROS_INFO("Visualizing plan 1_2 (catch pose) %s",success == moveit_msgs::MoveItErrorCodes::SUCCESS ? "SUCCESS" : "FAILED");
+   ROS_INFO("Visualizing plan 1_2 (stateCatch pose) %s",success == moveit_msgs::MoveItErrorCodes::SUCCESS ? "SUCCESS" : "FAILED");
    if (success  == moveit_msgs::MoveItErrorCodes::SUCCESS)  
    {
      moveitJudge_pub.publish(pub_msgs);
@@ -214,21 +223,21 @@ void stateRecuse(moveit::planning_interface::MoveGroupInterface &group)
   group.setNamedTarget("catch_put_1");
   moveit::planning_interface::MoveGroupInterface::Plan plan2_1;
   success = group.plan(plan2_1);
-  ROS_INFO("Visualizing plan 2_1 (catch pose) %s",success == moveit_msgs::MoveItErrorCodes::SUCCESS ? "SUCCESS" : "FAILED");
+  ROS_INFO("Visualizing plan 2_1 (stateRecuse pose) %s",success == moveit_msgs::MoveItErrorCodes::SUCCESS ? "SUCCESS" : "FAILED");
   if (success  == moveit_msgs::MoveItErrorCodes::SUCCESS)  group.execute(plan2_1);
 
   group.setStartState(*group.getCurrentState());
   group.setNamedTarget("catch_put_1_5");
   moveit::planning_interface::MoveGroupInterface::Plan plan2_2;
   success = group.plan(plan2_2);
-  ROS_INFO("Visualizing plan 2_2 (catch pose) %s",success == moveit_msgs::MoveItErrorCodes::SUCCESS ? "SUCCESS" : "FAILED");
+  ROS_INFO("Visualizing plan 2_2 (stateRecuse pose) %s",success == moveit_msgs::MoveItErrorCodes::SUCCESS ? "SUCCESS" : "FAILED");
   if (success  == moveit_msgs::MoveItErrorCodes::SUCCESS)  group.execute(plan2_2);
 
   group.setStartState(*group.getCurrentState());
   group.setNamedTarget("put");
   moveit::planning_interface::MoveGroupInterface::Plan plan2_3;
   success = group.plan(plan2_3);
-  ROS_INFO("Visualizing plan 2_3 (catch pose) %s",success == moveit_msgs::MoveItErrorCodes::SUCCESS ? "SUCCESS" : "FAILED");
+  ROS_INFO("Visualizing plan 2_3 (stateRecuse pose) %s",success == moveit_msgs::MoveItErrorCodes::SUCCESS ? "SUCCESS" : "FAILED");
   if (success  == moveit_msgs::MoveItErrorCodes::SUCCESS)  
   {
     moveitJudge_pub.publish(pub_msgs);
@@ -258,21 +267,21 @@ void stateInit(moveit::planning_interface::MoveGroupInterface &group)
   group.setStartState(*group.getCurrentState());
   group.setNamedTarget("catch_put_2");
   moveit::planning_interface::MoveGroupInterface::Plan plan3_1;
-  ROS_INFO("Visualizing plan 3_1 (catch pose) %s",success == moveit_msgs::MoveItErrorCodes::SUCCESS ? "SUCCESS" : "FAILED");
+  ROS_INFO("Visualizing plan 3_1 (stateInit pose) %s",success == moveit_msgs::MoveItErrorCodes::SUCCESS ? "SUCCESS" : "FAILED");
   if (success  == moveit_msgs::MoveItErrorCodes::SUCCESS)  group.execute(plan3_1);
 
   group.setStartState(*group.getCurrentState());
   group.setNamedTarget("catch_put_1_5");
   moveit::planning_interface::MoveGroupInterface::Plan plan3_2;
   success = group.plan(plan3_2);
-  ROS_INFO("Visualizing plan 3_2 (catch pose) %s",success == moveit_msgs::MoveItErrorCodes::SUCCESS ? "SUCCESS" : "FAILED");
+  ROS_INFO("Visualizing plan 3_2 (stateInit pose) %s",success == moveit_msgs::MoveItErrorCodes::SUCCESS ? "SUCCESS" : "FAILED");
   if (success  == moveit_msgs::MoveItErrorCodes::SUCCESS)  group.execute(plan3_2);
 
   group.setStartState(*group.getCurrentState());
   group.setNamedTarget("init_pose");
   moveit::planning_interface::MoveGroupInterface::Plan plan3_3;
   success = group.plan(plan3_3);
-  ROS_INFO("Visualizing plan 3_3 (catch pose) %s",success == moveit_msgs::MoveItErrorCodes::SUCCESS ? "SUCCESS" : "FAILED");
+  ROS_INFO("Visualizing plan 3_3 (stateInit pose) %s",success == moveit_msgs::MoveItErrorCodes::SUCCESS ? "SUCCESS" : "FAILED");
   if (success  == moveit_msgs::MoveItErrorCodes::SUCCESS)  
   {
     moveitJudge_pub.publish(pub_msgs);

@@ -13,6 +13,7 @@
 #include <control_msgs/FollowJointTrajectoryAction.h>
 #include <control_msgs/FollowJointTrajectoryFeedback.h>
 #include <trajectory_msgs/JointTrajectoryPoint.h>
+#include <sensor_msgs/JointState.h>
 #include <iostream>
 #include <string.h>
 #include <stdio.h>
@@ -33,6 +34,7 @@ public:
     as_.start();
     Pub_n = nh_.advertise<std_msgs::Int16MultiArray>("robot_hand_control",72);
     Sub_n = nh_.subscribe<std_msgs::Bool>("/moveit/judge", 1, boost::bind(&FollowJointTrajectoryAction::Sub_n_callback,this,_1));
+    Pub_jint = nh_.advertise<sensor_msgs::JointState>("/move_group/robothand_controller_joint_states",10);
     moveitJudge = false;
     feedback_.joint_names.resize(6);
     feedback_.actual.positions.resize(6);
@@ -44,6 +46,14 @@ public:
     feedback_.joint_names[3] = "Joint_4";
     feedback_.joint_names[4] = "Joint_5";
     feedback_.joint_names[5] = "Joint_6";
+    js.name.resize(6);
+    js.position.resize(6);
+    js.name[0] = "Joint_1";
+    js.name[1] = "Joint_2";
+    js.name[2] = "Joint_3";
+    js.name[3] = "Joint_4";
+    js.name[4] = "Joint_5";
+    js.name[5] = "Joint_6";
     ROS_INFO("action start");
  }
    
@@ -159,23 +169,33 @@ void Sub_n_callback(const std_msgs::Bool::ConstPtr& data)
    		return sentdata;
  	}
 
+sensor_msgs::JointState getJointState()
+{
+  return js;
+}
+
  void goalCB()
  {
-    ROS_INFO("goal is receive"); 
+     ROS_INFO("goal is receive"); 
     int i,j,Pos_length;
     double points_end[6];
     int points_end_data[6];
     if(as_.isNewGoalAvailable())
      {
+      js.position.clear();
       points_=&(as_.acceptNewGoal()->trajectory.points);
       Pos_length=points_->size(); 
       for(int co =0; co<6;co++)
       {
         points_end[co] = points_->at(Pos_length-1).positions[co];// points_[Pos_length-6+co];
+        js.position.push_back(points_->at(Pos_length-1).positions[co]);
+        js.position[co] = points_->at(Pos_length-1).positions[co];
         feedback_.desired.positions[co] = points_->at(Pos_length-1).positions[co];
         feedback_.actual.positions[co] = points_->at(Pos_length-1).positions[co];
         feedback_.error.positions[co] = 0;
-      }    
+      }
+      js.header.stamp = ros::Time::now();    
+      Pub_jint.publish(js);
       ROS_INFO("Pos_length:%d",Pos_length);  
       //sen_length=Pos_length*6;
      }
@@ -204,8 +224,10 @@ void Sub_n_callback(const std_msgs::Bool::ConstPtr& data)
     ROS_INFO(" ");
    }
    data_send(pos_int,Pos_length*6);*/
-   as_.publishFeedback(feedback_);
-   as_.setSucceeded();
+   //as_.publishFeedback(feedback_);
+  control_msgs::FollowJointTrajectoryResult result;
+  result.error_code = 0;
+  as_.setSucceeded(result);
  } 
 
  void preemptCB()
@@ -216,9 +238,11 @@ void Sub_n_callback(const std_msgs::Bool::ConstPtr& data)
  }
 
   protected: 
+  sensor_msgs::JointState js;
   ros::NodeHandle nh_;
   ros::Publisher Pub_n;
   ros::Subscriber Sub_n;
+  ros::Publisher Pub_jint;
   actionlib::SimpleActionServer<control_msgs::FollowJointTrajectoryAction> as_;
   bool moveitJudge;
   std::string action_name_;
@@ -243,6 +267,7 @@ int main(int argc, char** argv)
  {
    ros::init(argc, argv, "robothand_hard_driver");
    FollowJointTrajectoryAction followJointTrajectoryAction("six_hand_controller/follow_joint_trajectory");
+  // sensor_msgs::JointState jsData;
    //serial
   /* ros::NodeHandle n_("~");
    std::string serial_port;
@@ -272,6 +297,7 @@ int main(int argc, char** argv)
     // return -1;
    }
 */
+
   ros::spin();
   return 0;
 }
