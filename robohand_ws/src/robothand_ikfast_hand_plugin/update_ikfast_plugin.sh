@@ -1,0 +1,1 @@
+rosrun moveit_kinematics create_ikfast_moveit_plugin.py robothand hand robothand_ikfast_hand_plugin /home/min/robohand_ws/src/robothand_ikfast_hand_plugin/src/robothand_hand_ikfast_solver.cpp

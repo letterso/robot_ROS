@@ -20,9 +20,7 @@ Establish time: 2018.06.04
   Object location: PCL  
   
   robothand:  
-  moveit,trac_ik  
-
-  
+  moveit,trac_ik,ikfast  
 
 # Tree  
   src  
