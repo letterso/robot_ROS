@@ -153,20 +153,20 @@ void Sub_n_callback(const std_msgs::Bool::ConstPtr& data)
   //translate radian to data which control servo
  	int data_process(double radian,int num)
  	{
-  	 	int sentdata;
-      if(num == 0)
-      {
-        sentdata=(int)(radian/M_PI*180.0/300.0*1024.0);
-      }
-        if(num >0 &&num<3)
-      {
-        sentdata=(int)(radian/M_PI*180.0/360.0*4096.0);
-      }
-        if(num >3 && num<6)
-      {
-        sentdata=(int)(radian/M_PI*180.0/220.0*1024.0);
-      }
-   		return sentdata;
+     int sentdata;
+     if(num == 0)
+     {
+       sentdata=(int)(radian/M_PI*180.0/300.0*1024.0);
+     }
+     if(num >0 &&num<3)
+     {
+       sentdata=(int)(radian/M_PI*180.0/360.0*4096.0);
+     }
+     if(num >3 && num<6)
+     {
+       sentdata=(int)(radian/M_PI*180.0/220.0*1024.0);
+     }
+   	 return sentdata;
  	}
 
 sensor_msgs::JointState getJointState()
@@ -176,41 +176,39 @@ sensor_msgs::JointState getJointState()
 
  void goalCB()
  {
-     ROS_INFO("goal is receive"); 
-    int i,j,Pos_length;
-    double points_end[6];
-    int points_end_data[6];
-    if(as_.isNewGoalAvailable())
+   ROS_INFO("goal is receive"); 
+   int i,j,Pos_length;
+   double points_end[6];
+   int points_end_data[6];
+   if(as_.isNewGoalAvailable())
+   {
+     js.position.clear();
+     points_=&(as_.acceptNewGoal()->trajectory.points);
+     Pos_length=points_->size(); 
+     for(int co =0; co<6;co++)
      {
-      js.position.clear();
-      points_=&(as_.acceptNewGoal()->trajectory.points);
-      Pos_length=points_->size(); 
-      for(int co =0; co<6;co++)
-      {
-        points_end[co] = points_->at(Pos_length-1).positions[co];// points_[Pos_length-6+co];
-        js.position.push_back(points_->at(Pos_length-1).positions[co]);
-        js.position[co] = points_->at(Pos_length-1).positions[co];
-        feedback_.desired.positions[co] = points_->at(Pos_length-1).positions[co];
-        feedback_.actual.positions[co] = points_->at(Pos_length-1).positions[co];
-        feedback_.error.positions[co] = 0;
-      }
-      js.header.stamp = ros::Time::now();    
-      Pub_jint.publish(js);
-      ROS_INFO("Pos_length:%d",Pos_length);  
-      //sen_length=Pos_length*6;
+       points_end[co] = points_->at(Pos_length-1).positions[co];// points_[Pos_length-6+co];
+       js.position.push_back(points_->at(Pos_length-1).positions[co]);
+       feedback_.desired.positions[co] = points_->at(Pos_length-1).positions[co];
+       feedback_.actual.positions[co] = points_->at(Pos_length-1).positions[co];
+       feedback_.error.positions[co] = 0;
      }
-    else
-     {
-       ROS_INFO("goal is not available"); 
-     }
-
-     for(j=0;j<6;j++)
-      {
-       points_end_data[j] = data_process(points_end[j],j);
-       angle=(int)(points_end[j]/M_PI*180);
-       ROS_INFO("position%d=%d angle:%d",j,points_end_data[j],angle);  
-      }
-      end_data_send(points_end_data);
+     js.header.stamp = ros::Time::now();    
+     Pub_jint.publish(js);
+     ROS_INFO("Pos_length:%d",Pos_length);  
+     //sen_length=Pos_length*6;
+   }
+   else
+   {
+     ROS_INFO("goal is not available"); 
+   }
+   for(j=0;j<6;j++)
+   {
+     points_end_data[j] = data_process(points_end[j],j);
+     angle=(int)(points_end[j]/M_PI*180);
+     ROS_INFO("position%d=%d angle:%d",j,points_end_data[j],angle);
+   }
+   end_data_send(points_end_data);
    /*for(i=0;i<Pos_length;i++)
    {
      for(j=0;j<6;j++)
@@ -225,9 +223,8 @@ sensor_msgs::JointState getJointState()
    }
    data_send(pos_int,Pos_length*6);*/
    //as_.publishFeedback(feedback_);
-  control_msgs::FollowJointTrajectoryResult result;
-  result.error_code = 0;
-  as_.setSucceeded(result);
+   result_.error_code = 0;
+   as_.setSucceeded(result_);
  } 
 
  void preemptCB()

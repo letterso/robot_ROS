@@ -19,7 +19,7 @@
 #include <moveit_msgs/AttachedCollisionObject.h>
 #include <moveit_msgs/CollisionObject.h>
 #include <moveit/robot_state/robot_state.h>
-#include "actionlib/client/simple_action_client.h"  
+#include <actionlib/client/simple_action_client.h>
 #include <control_msgs/FollowJointTrajectoryAction.h>
 
 #include <geometry_msgs/PointStamped.h>
@@ -185,9 +185,9 @@ void stateCatch(moveit::planning_interface::MoveGroupInterface &group)
   // state = *planning_display_->getQueryGoalState();
   //robot_state::RobotState goal = *display->getQueryGoalState();
   //robot_state::RobotState goal = group.getQueryGoalState();
-   robot_state::RobotState start_state(*group.getCurrentState());
-   group.setStartStateToCurrentState();
-  //group.setStartState(*group.getCurrentState());
+  // robot_state::RobotState start_state(*group.getCurrentState());
+  // group.setStartStateToCurrentState();
+  group.setStartState(*group.getCurrentState());
   // group.setStartStateToCurrentState();
    group.setPoseTarget(target_pose);
    moveit::planning_interface::MoveGroupInterface::Plan plan1_2;
@@ -293,6 +293,8 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "robomoveit");
   ros::NodeHandle nh;
+ // tf::TransformListener listener(ros::Duration(10));
+ // ros::Timer timer = nh.createTimer(ros::Duration(1.0), boost::bind(&transformPoint, boost::ref(listener)));
   ros::AsyncSpinner spinner(0);
   
   moveit::planning_interface::MoveGroupInterface handGroup("hand");
@@ -322,7 +324,7 @@ int main(int argc, char **argv)
 
  getClassPoint = true;
  classCatchJudge = true;
- classReleaseJudge = true;
+ classReleaseJudge = false;
  while (1)
  {
     if(getClassPoint)//初始-抓取

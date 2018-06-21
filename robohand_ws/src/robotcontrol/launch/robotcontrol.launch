@@ -13,8 +13,8 @@
     <param name="baud" value="57600"/>
   </node>
 
-  <!-- Run demo.launch 启动rviz和move_group--> 
-  <include file="$(find robothand_config)/launch/demo.launch">
+  <!-- 启动rviz和move_group --> 
+  <include file="$(find robothand_config)/launch/moveit_planning_execution.launch">
   </include>
 
   <!--Run robothand moveit control-->

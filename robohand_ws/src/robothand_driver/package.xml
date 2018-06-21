@@ -40,7 +40,7 @@
   <build_depend>actionlib</build_depend>
   <build_depend>actionlib_msgs</build_depend>
   <build_depend>robothand</build_depend>
-  <build_depend>robothand_config</build_depend>
+  
   <build_depend>roscpp</build_depend>
   <build_depend>rospy</build_depend>
   <build_depend>serial</build_depend>
@@ -48,7 +48,7 @@
   <build_export_depend>actionlib</build_export_depend>
   <build_export_depend>actionlib_msgs</build_export_depend>
   <build_export_depend>robothand</build_export_depend>
-  <build_export_depend>robothand_config</build_export_depend>
+  
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>rospy</build_export_depend>
   <build_export_depend>serial</build_export_depend>
@@ -58,7 +58,7 @@
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>robothand</exec_depend>
-  <exec_depend>robothand_config</exec_depend>
+  
   <exec_depend>roscpp</exec_depend>
   <exec_depend>rospy</exec_depend>
   <exec_depend>serial</exec_depend>
@@ -72,4 +72,7 @@
 <build_export_depend>message_runtime</build_export_depend>
 <build_export_depend>sensor_msgs</build_export_depend>
 <exec_depend>sensor_msgs</exec_depend>
+<build_depend>robothand_moveit_config</build_depend>
+<build_export_depend>robothand_moveit_config</build_export_depend>
+<exec_depend>robothand_moveit_config</exec_depend>
 </package>

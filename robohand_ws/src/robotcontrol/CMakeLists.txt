@@ -7,26 +7,7 @@ add_compile_options(-std=c++11)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-  actionlib
-  actionlib_msgs
-  cmake_modules
-  geometry_msgs
-  interactive_markers
-  message_generation
-  message_runtime
-  moveit_core
-  moveit_ros_perception
-  moveit_ros_planning_interface
-  pluginlib
-  robothand
-  robothand
-  robothand_config
-  roscpp
-  rospy
-  std_msgs
-  tf
-)
+find_package(catkin REQUIRED COMPONENTS actionlib actionlib_msgs cmake_modules geometry_msgs interactive_markers message_generation message_runtime moveit_core moveit_ros_perception moveit_ros_planning_interface pluginlib robothand robothand robothand_moveit_config roscpp rospy std_msgs tf)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -236,5 +217,13 @@ add_executable(getState
 )
 add_dependencies(getState ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(getState
+  ${catkin_LIBRARIES}
+)
+
+add_executable(robot_state_publisher
+  src/robot_state_publisher.cpp
+)
+add_dependencies(robot_state_publisher ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(robot_state_publisher
   ${catkin_LIBRARIES}
 )
