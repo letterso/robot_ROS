@@ -1,12 +1,10 @@
 # add library
-include_directories(./)
-add_library(${PROJECT_NAME} cv_bridge.cpp rgb_colors.cpp)
-add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
+add_library(${PROJECT_NAME} cv_bridge.cpp)
+add_dependencies(${PROJECT_NAME} sensor_msgs_gencpp)
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBRARIES} ${catkin_LIBRARIES})
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
 
-if(NOT ANDROID)
 # add a Boost Python library
 find_package(PythonInterp REQUIRED)
 find_package(PythonLibs "${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}")
@@ -26,17 +24,16 @@ if(NOT PYTHON_NUMPY_INCLUDE_DIR)
     endif(PYTHON_NUMPY_PROCESS EQUAL 0)
  endif(NOT PYTHON_NUMPY_INCLUDE_DIR)
 
-include_directories(${PYTHON_INCLUDE_PATH} ${Boost_INCLUDE_DIRS} ${PYTHON_NUMPY_INCLUDE_DIR})
+include_directories(SYSTEM ${PYTHON_INCLUDE_PATH}
+                           ${Boost_INCLUDE_DIRS}
+                           ${PYTHON_NUMPY_INCLUDE_DIR} # cv_bridge module uses NumPy functions
+)
 
 if (PYTHON_VERSION_MAJOR VERSION_EQUAL 3)
   add_definitions(-DPYTHON3)
 endif()
 
-if (OpenCV_VERSION_MAJOR VERSION_EQUAL 3)
-add_library(${PROJECT_NAME}_boost module.cpp module_opencv3.cpp)
-else()
-add_library(${PROJECT_NAME}_boost module.cpp module_opencv2.cpp)
-endif()
+add_library(${PROJECT_NAME}_boost module.cpp)
 target_link_libraries(${PROJECT_NAME}_boost ${Boost_LIBRARIES}
                                             ${catkin_LIBRARIES}
                                             ${PYTHON_LIBRARIES}
@@ -53,4 +50,3 @@ if(APPLE)
 endif()
 
 install(TARGETS ${PROJECT_NAME}_boost DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}/boost/)
-endif()

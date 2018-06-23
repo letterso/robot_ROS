@@ -1,0 +1,10 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: robothand
+    relative_path: robots/robothand.urdf
+  SRDF:
+    relative_path: config/robothand.srdf
+  CONFIG:
+    author_name: min
+    author_email: lettersony@outlook.com
+    generated_timestamp: 1523792868

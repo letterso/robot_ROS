@@ -1,8 +1,6 @@
 #include "image_geometry/pinhole_camera_model.h"
 #include <sensor_msgs/distortion_models.h>
-#ifdef BOOST_SHARED_PTR_HPP_INCLUDED
 #include <boost/make_shared.hpp>
-#endif
 
 namespace image_geometry {
 
@@ -13,13 +11,13 @@ struct PinholeCameraModel::Cache
   DistortionState distortion_state;
 
   cv::Mat_<double> K_binned, P_binned; // Binning applied, but not cropping
-
+  
   mutable bool full_maps_dirty;
   mutable cv::Mat full_map1, full_map2;
 
   mutable bool reduced_maps_dirty;
   mutable cv::Mat reduced_map1, reduced_map2;
-
+  
   mutable bool rectified_roi_dirty;
   mutable cv::Rect rectified_roi;
 
@@ -58,7 +56,7 @@ bool update(const T& new_val, T& my_val)
   return true;
 }
 
-// For std::vector
+// For boost::array, std::vector
 template<typename MatT>
 bool updateMat(const MatT& new_mat, MatT& my_mat, cv::Mat_<double>& cv_mat, int rows, int cols)
 {
@@ -85,12 +83,8 @@ bool PinholeCameraModel::fromCameraInfo(const sensor_msgs::CameraInfo& msg)
 {
   // Create our repository of cached data (rectification maps, etc.)
   if (!cache_)
-#ifdef BOOST_SHARED_PTR_HPP_INCLUDED
     cache_ = boost::make_shared<Cache>();
-#else
-    cache_ = std::make_shared<Cache>();
-#endif
-
+  
   // Binning = 0 is considered the same as binning = 1 (no binning).
   uint32_t binning_x = msg.binning_x ? msg.binning_x : 1;
   uint32_t binning_y = msg.binning_y ? msg.binning_y : 1;
@@ -104,7 +98,7 @@ bool PinholeCameraModel::fromCameraInfo(const sensor_msgs::CameraInfo& msg)
 
   // Update time stamp (and frame_id if that changes for some reason)
   cam_info_.header = msg.header;
-
+  
   // Update any parameters that have changed. The full rectification maps are
   // invalidated by any change in the calibration parameters OR binning.
   bool &full_dirty = cache_->full_maps_dirty;
@@ -133,16 +127,7 @@ bool PinholeCameraModel::fromCameraInfo(const sensor_msgs::CameraInfo& msg)
   // Figure out how to handle the distortion
   if (cam_info_.distortion_model == sensor_msgs::distortion_models::PLUMB_BOB ||
       cam_info_.distortion_model == sensor_msgs::distortion_models::RATIONAL_POLYNOMIAL) {
-    // If any distortion coefficient is non-zero, then need to apply the distortion
-    cache_->distortion_state = NONE;
-    for (size_t i = 0; i < cam_info_.D.size(); ++i)
-    {
-      if (cam_info_.D[i] != 0)
-      {
-        cache_->distortion_state = CALIBRATED;
-        break;
-      }
-    }
+    cache_->distortion_state = (cam_info_.D[0] == 0.0) ? NONE : CALIBRATED;
   }
   else
     cache_->distortion_state = UNKNOWN;
@@ -300,13 +285,7 @@ void PinholeCameraModel::rectifyImage(const cv::Mat& raw, cv::Mat& rectified, in
       break;
     case CALIBRATED:
       initRectificationMaps();
-      if (raw.depth() == CV_32F || raw.depth() == CV_64F)
-      {
-        cv::remap(raw, rectified, cache_->reduced_map1, cache_->reduced_map2, interpolation, cv::BORDER_CONSTANT, std::numeric_limits<float>::quiet_NaN());
-      }
-      else {
-        cv::remap(raw, rectified, cache_->reduced_map1, cache_->reduced_map2, interpolation);
-      }
+      cv::remap(raw, rectified, cache_->reduced_map1, cache_->reduced_map2, interpolation);
       break;
     default:
       assert(cache_->distortion_state == UNKNOWN);

@@ -20,30 +20,6 @@ TEST(CvBridgeTest, NonContinuous)
   EXPECT_EQ(msg->step, 6);
 }
 
-TEST(CvBridgeTest, ChannelOrder)
-{
-  cv::Mat_<uint16_t> mat(200, 200);
-  mat.setTo(cv::Scalar(1000,0,0,0));
-  sensor_msgs::ImagePtr image(new sensor_msgs::Image());
-
-  image = cv_bridge::CvImage(image->header, sensor_msgs::image_encodings::MONO16, mat).toImageMsg();
-
-  cv_bridge::CvImageConstPtr cv_ptr = cv_bridge::toCvShare(image);
-
-  cv_bridge::CvImagePtr res = cv_bridge::cvtColor(cv_ptr, sensor_msgs::image_encodings::BGR8);
-  EXPECT_EQ(res->encoding, sensor_msgs::image_encodings::BGR8);
-  EXPECT_EQ(res->image.type(), cv_bridge::getCvType(res->encoding));
-  EXPECT_EQ(res->image.channels(), sensor_msgs::image_encodings::numChannels(res->encoding));
-  EXPECT_EQ(res->image.depth(), CV_8U);
-
-  // The matrix should be the following
-  cv::Mat_<cv::Vec3b> gt(200, 200);
-  gt.setTo(cv::Scalar(1, 1, 1)*1000.*255./65535.);
-
-  ASSERT_EQ(res->image.type(), gt.type());
-  EXPECT_EQ(cv::norm(res->image, gt, cv::NORM_INF), 0);
-}
-
 TEST(CvBridgeTest, initialization)
 {
   sensor_msgs::Image image;
@@ -103,35 +79,6 @@ TEST(CvBridgeTest, imageMessageStep)
   ASSERT_EQ(220, cv_ptr->image.rows);
   ASSERT_EQ(200, cv_ptr->image.cols);
   ASSERT_EQ(200, cv_ptr->image.step[0]);
-}
-
-TEST(CvBridgeTest, imageMessageConversion)
-{
-  sensor_msgs::Image imgmsg;
-  cv_bridge::CvImagePtr cv_ptr;
-  imgmsg.height = 220;
-  imgmsg.width = 200;
-  imgmsg.is_bigendian = false;
-
-  // image with data type float32 and 1 channels
-  imgmsg.encoding = "32FC1";
-  imgmsg.step = imgmsg.width * 32 / 8 * 1;
-  imgmsg.data.resize(imgmsg.height * imgmsg.step);
-  ASSERT_NO_THROW(cv_ptr = cv_bridge::toCvCopy(imgmsg, imgmsg.encoding));
-  ASSERT_EQ(imgmsg.height, cv_ptr->image.rows);
-  ASSERT_EQ(imgmsg.width, cv_ptr->image.cols);
-  ASSERT_EQ(1, cv_ptr->image.channels());
-  ASSERT_EQ(imgmsg.step, cv_ptr->image.step[0]);
-
-  // image with data type float32 and 10 channels
-  imgmsg.encoding = "32FC10";
-  imgmsg.step = imgmsg.width * 32 / 8 * 10;
-  imgmsg.data.resize(imgmsg.height * imgmsg.step);
-  ASSERT_NO_THROW(cv_ptr = cv_bridge::toCvCopy(imgmsg, imgmsg.encoding));
-  ASSERT_EQ(imgmsg.height, cv_ptr->image.rows);
-  ASSERT_EQ(imgmsg.width, cv_ptr->image.cols);
-  ASSERT_EQ(10, cv_ptr->image.channels());
-  ASSERT_EQ(imgmsg.step, cv_ptr->image.step[0]);
 }
 
 int main(int argc, char** argv)

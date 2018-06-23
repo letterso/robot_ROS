@@ -6,7 +6,6 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 #include <stdexcept>
-#include <string>
 
 namespace image_geometry {
 
@@ -214,7 +213,7 @@ public:
    * \brief Returns the number of rows in each bin.
    */
   uint32_t binningY() const;
-  
+
   /**
    * \brief Compute delta u, given Z and delta X in Cartesian space.
    *
@@ -271,11 +270,7 @@ protected:
 
   // Use PIMPL here so we can change internals in patch updates if needed
   struct Cache;
-#ifdef BOOST_SHARED_PTR_HPP_INCLUDED
   boost::shared_ptr<Cache> cache_; // Holds cached data for internal use
-#else
-  std::shared_ptr<Cache> cache_; // Holds cached data for internal use
-#endif
 
   void initRectificationMaps() const;
 
