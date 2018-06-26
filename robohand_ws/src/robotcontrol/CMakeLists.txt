@@ -227,3 +227,11 @@ add_dependencies(robot_state_publisher ${${PROJECT_NAME}_EXPORTED_TARGETS} ${cat
 target_link_libraries(robot_state_publisher
   ${catkin_LIBRARIES}
 )
+
+add_executable(robot_control_node
+  src/robot_control_node.cpp
+)
+add_dependencies(robot_control_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(robot_control_node
+  ${catkin_LIBRARIES}
+)
