@@ -4,11 +4,12 @@ Establish time: 2018.06.04
   
 
 # Environment:  
-  Window System: Window10; tensoflow1.6.0-GPU; OpenCV3.1.0;   
-  Linux System: Ubuntu16.04; tensoflow1.6.0-CPU ;ROS Kinetic ; OpenCV3.3.1;  
+  Window System: Window10; tensoflow1.10.0-GPU; OpenCV3.1.0;   
+  Linux System: Ubuntu16.04; tensoflow1.10.0-CPU ;ROS Kinetic ; OpenCV3.3.1;  
 
 # IDE  
   RoboWare Studio  
+  Qt5.9  
 
 # Hardware  
   Arduino mega2560  
@@ -21,6 +22,9 @@ Establish time: 2018.06.04
   
   robothand:  
   moveit,trac_ik,ikfast  
+
+  ROS Industrial:  
+  STOMP
 
 # Tree  
 .
