@@ -1,0 +1,24 @@
+<launch>
+  <!-- using the real controller serial 串口选择，修改格式：port:=””-->
+  <arg name="port" default="/dev/ttyUSB0"/>
+  
+  <!-- Run rostopic to check the data 接收发送到下位机的数据-->
+  <node pkg="robothand_driver" type="robothand_hard_driver" name="robothand_hard_driver" output="screen">
+  <param name="port" type="string" value="$(arg port)"/>
+  </node>
+
+  <!-- Run serial 启动串口，串口串口为port定义，波特率57600-->
+  <node pkg="rosserial_python" type="serial_node.py" name="serial_node">
+    <param name="port" value="$(arg port)"/>
+    <param name="baud" value="57600"/>
+  </node>
+
+  <!-- 启动rviz和move_group --> 
+  <include file="$(find robothand_moveit_config)/launch/moveit_planning_execution.launch">
+  </include>
+
+  <!--Run robothand moveit control-->
+  <node pkg="robotcontrol" name="robomoveit" type="robomoveit" output="screen">
+  </node>
+  
+</launch>

@@ -1,0 +1,10 @@
+<launch>
+  <!-- 启动rviz和move_group --> 
+  <include file="$(find robothand_moveit_config)/launch/demo.launch">
+  </include>
+
+  <!--Run robothand moveit control-->
+  <node pkg="robotcontrol" name="pointMove" type="pointMove" output="screen">
+  </node>
+  
+</launch>
